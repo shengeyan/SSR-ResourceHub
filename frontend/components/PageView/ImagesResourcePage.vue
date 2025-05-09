@@ -72,10 +72,7 @@
                     "
                 />
                 <p class="image-desc">{{ selectedImage?.detail }}</p>
-                <el-button
-                    type="primary"
-                    @click="handleDownload"
-                >
+                <el-button type="primary" @click="handleDownload">
                     下载图片
                 </el-button>
 
@@ -146,6 +143,22 @@ const handlePageChange = (page) => {
 
 // 下载图片
 const handleDownload = () => {
+    // 判断是否登录
+    if (!authStore.loginStatus) {
+        ElMessageBox.confirm('您尚未登录，是否登录后继续下载？', '未登录', {
+            confirmButtonText: '登录',
+            cancelButtonText: '取消',
+            type: 'warning',
+        })
+            .then(() => {
+                router.push('/login')
+            })
+            .catch(() => {
+                ElMessage.info('下载已取消')
+            })
+        return
+    }
+
     try {
         const fileUrl = selectedImage.value.url
         const fileName = selectedImage.value.name
@@ -214,7 +227,6 @@ const handleDelete = async () => {
 <style scoped>
 .image-resource-page {
     font-family: 'Microsoft YaHei', serif;
-    background: url('/ink-brush-bg.jpg') no-repeat center center fixed;
     background-size: cover;
     color: #2c3e50;
     min-height: 100vh;

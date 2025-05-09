@@ -63,6 +63,10 @@
 import { ref, computed, watchEffect } from 'vue'
 import NavBar from '@/components/NavBar.vue'
 import ResourceApi from '~/api/resources/resources.js' // 引入你的资源请求接口
+import { useAuthStore } from '~/stores/auth'
+import { ElMessageBox, ElMessage } from 'element-plus'
+
+const authStore = useAuthStore()
 
 const filesCache = ref({}) // Cache for files by page
 const files = ref([]) // All files data
@@ -112,11 +116,27 @@ const detailVisible = ref(false)
 const selectedFile = ref(null)
 
 const handleDownload = () => {
+    // 判断是否登录
+    if (!authStore.loginStatus) {
+        ElMessageBox.confirm('您尚未登录，是否登录后继续下载？', '未登录', {
+            confirmButtonText: '登录',
+            cancelButtonText: '取消',
+            type: 'warning',
+        })
+            .then(() => {
+                router.push('/login')
+            })
+            .catch(() => {
+                ElMessage.info('下载已取消')
+            })
+        return
+    }
+
     try {
-        const fileUrl = selectedFile.value.url
+        const fileUrl = selectedAudio.value.url
         const link = document.createElement('a')
         link.href = fileUrl
-        link.download = `${selectedFile.value.name}.mp4`
+        link.download = `${selectedAudio.value.name}.mp4`
         link.click()
     } catch (error) {
         console.error('下载失败', error)

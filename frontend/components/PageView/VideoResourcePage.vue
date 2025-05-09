@@ -118,6 +118,7 @@
 import { ref, reactive, computed, watchEffect } from 'vue'
 import { useAuthStore } from '~/stores/auth'
 import ResourceApi from '~/api/resources/resources.js'
+import { ElMessageBox, ElMessage } from 'element-plus'
 
 const authStore = useAuthStore()
 
@@ -162,11 +163,27 @@ const handlePageChange = (page) => {
 
 // 下载视频
 const handleDownload = () => {
+    // 判断是否登录
+    if (!authStore.loginStatus) {
+        ElMessageBox.confirm('您尚未登录，是否登录后继续下载？', '未登录', {
+            confirmButtonText: '登录',
+            cancelButtonText: '取消',
+            type: 'warning',
+        })
+            .then(() => {
+                router.push('/login')
+            })
+            .catch(() => {
+                ElMessage.info('下载已取消')
+            })
+        return
+    }
+
     try {
-        const fileUrl = selectedVideo.value.url
+        const fileUrl = selectedAudio.value.url
         const link = document.createElement('a')
         link.href = fileUrl
-        link.download = `${selectedVideo.value.name}.mp4`
+        link.download = `${selectedAudio.value.name}.mp4`
         link.click()
     } catch (error) {
         console.error('下载失败', error)
@@ -218,7 +235,6 @@ watchEffect(() => {
 <style scoped>
 .video-resource-page {
     font-family: 'Microsoft YaHei', serif;
-    background: url('/ink-brush-bg.jpg') no-repeat center center fixed;
     background-size: cover;
     color: #2c3e50;
     min-height: 100vh;

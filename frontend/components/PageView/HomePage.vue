@@ -145,7 +145,6 @@ onMounted(async () => {
     overflow-y: auto;
     overflow-x: hidden;
     display: block;
-    background: url('/ink-brush-bg.jpg') no-repeat center center fixed;
     background-size: cover;
     font-family: 'Microsoft YaHei', serif;
     color: #2c3e50;

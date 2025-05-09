@@ -28,9 +28,7 @@
                             </p>
                             <p class="audio-info">格式：{{ item.mime_type }}</p>
                         </div>
-                        <el-button
-                            type="text"
-                            @click="openDetail(item)"
+                        <el-button type="text" @click="openDetail(item)"
                             >详情</el-button
                         >
                     </el-card>
@@ -83,9 +81,11 @@
 
 <script setup>
 import { ref, computed, watchEffect } from 'vue'
-import NavBar from '@/components/NavBar.vue'
 import ResourceApi from '~/api/resources/resources.js'
+import { useAuthStore } from '~/stores/auth'
+import { ElMessageBox, ElMessage } from 'element-plus'
 
+const authStore = useAuthStore()
 const audiosCache = ref({})
 const audios = ref([])
 const total = ref(0)
@@ -134,6 +134,22 @@ watchEffect(() => {
 })
 
 const handleDownload = () => {
+    // 判断是否登录
+    if (!authStore.loginStatus) {
+        ElMessageBox.confirm('您尚未登录，是否登录后继续下载？', '未登录', {
+            confirmButtonText: '登录',
+            cancelButtonText: '取消',
+            type: 'warning',
+        })
+            .then(() => {
+                router.push('/login')
+            })
+            .catch(() => {
+                ElMessage.info('下载已取消')
+            })
+        return
+    }
+
     try {
         const fileUrl = selectedAudio.value.url
         const link = document.createElement('a')
@@ -149,7 +165,6 @@ const handleDownload = () => {
 <style scoped>
 .audio-resource-page {
     font-family: 'Microsoft YaHei', serif;
-    background: url('/ink-brush-bg.jpg') no-repeat center center fixed;
     background-size: cover;
     color: #2c3e50;
     min-height: 100vh;

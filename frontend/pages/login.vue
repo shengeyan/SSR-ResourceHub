@@ -300,7 +300,6 @@ const handleResetPassword = () => {
 <style scoped lang="scss">
 .auth-page {
     height: 100vh;
-    background: url('/ink-brush-bg.jpg') center/cover no-repeat;
     display: flex;
     justify-content: center;
     align-items: center;
