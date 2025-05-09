@@ -1,0 +1,12 @@
+// assets/scss/main.scss
+$primary-color: #42b983;
+
+body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+body::-webkit-scrollbar {
+    display: none;
+}
