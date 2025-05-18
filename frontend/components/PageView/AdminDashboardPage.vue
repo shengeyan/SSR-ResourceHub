@@ -200,7 +200,6 @@ const handleDownload = (row) => {
             ElMessage.error('图片下载失败')
         }
     } else {
-        // 非图片资源普通方式下载
         try {
             const link = document.createElement('a')
             link.href = fileUrl

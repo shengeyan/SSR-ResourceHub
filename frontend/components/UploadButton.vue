@@ -24,6 +24,10 @@
 import { ref, reactive, onMounted } from 'vue'
 import UploadDialog from '@/components/UploadDialog.vue'
 import { Upload } from '@element-plus/icons-vue'
+import { useAuthStore } from '~/stores/auth'
+import { ElMessageBox, ElMessage } from 'element-plus'
+
+const authStore = useAuthStore()
 
 const uploadDialogRef = ref()
 const dialogVisible = ref(false)
@@ -33,12 +37,6 @@ let offset = { x: 0, y: 0 }
 
 const BUTTON_WIDTH = 60
 const BUTTON_HEIGHT = 60
-
-// 初始化时将按钮放置到右下角
-onMounted(() => {
-    position.left = window.innerWidth - BUTTON_WIDTH - 20 // 右下角，20px距离右边缘
-    position.top = window.innerHeight - BUTTON_HEIGHT - 20 // 右下角，20px距离底边缘
-})
 
 const startDrag = (e) => {
     hasMoved.value = false
@@ -71,8 +69,7 @@ const stopDrag = () => {
     document.removeEventListener('mousemove', onDrag)
     document.removeEventListener('mouseup', stopDrag)
 
-    // 添加吸附逻辑：靠近左边或右边吸附
-    const threshold = 40 // 吸附临界值
+    const threshold = 40
     if (position.left <= threshold) {
         position.left = 0
     } else if (position.left >= window.innerWidth - BUTTON_WIDTH - threshold) {
@@ -81,6 +78,21 @@ const stopDrag = () => {
 }
 
 const handleClick = () => {
+    if (!authStore.loginStatus) {
+        ElMessageBox.confirm('您尚未登录，是否登录后继续下载？', '未登录', {
+            confirmButtonText: '登录',
+            cancelButtonText: '取消',
+            type: 'warning',
+        })
+            .then(() => {
+                router.push('/login')
+            })
+            .catch(() => {
+                ElMessage.info('下载已取消')
+            })
+        return
+    }
+
     if (!hasMoved.value && !dialogVisible.value) {
         dialogVisible.value = true
         uploadDialogRef.value?.open()
@@ -90,6 +102,11 @@ const handleClick = () => {
 const onDialogClose = () => {
     dialogVisible.value = false
 }
+
+onMounted(() => {
+    position.left = window.innerWidth - BUTTON_WIDTH - 20
+    position.top = window.innerHeight - BUTTON_HEIGHT - 20
+})
 </script>
 
 <style scoped>

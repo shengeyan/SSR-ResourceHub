@@ -8,11 +8,13 @@ services:
             context: ./frontend
             dockerfile: Dockerfile
         ports:
-            - '3003:80'
+            - '3010:3010'
         networks:
             - app-network
         environment:
             - NODE_ENV=production
+            - NITRO_PORT=3010
+        restart: always
 
     # 后端服务
     backend:
@@ -24,6 +26,7 @@ services:
             - '3011:3011'
         networks:
             - app-network
+        restart: always
 
 # 网络
 networks:

@@ -8,7 +8,8 @@ WORKDIR /app
 COPY package*.json ./
 
 # 安装依赖
-RUN npm install
+# RUN npm install
+RUN npm install --force
 
 # 复制项目文件
 COPY . .
