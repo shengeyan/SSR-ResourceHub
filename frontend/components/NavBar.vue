@@ -37,7 +37,7 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue'
+import { ref, watch, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '~/stores/auth'
 import { useSearchStore } from '~/stores/searchStore' // 引入 Pinia store
@@ -45,11 +45,7 @@ import { useSearchStore } from '~/stores/searchStore' // 引入 Pinia store
 const authStore = useAuthStore()
 const searchStore = useSearchStore()
 const router = useRouter()
-
-const userAvatar = ref(
-    authStore.user?.avatar ||
-        'https://api.dicebear.com/7.x/bottts/svg?seed=InkStyle'
-)
+const userAvatar = ref('https://api.dicebear.com/7.x/bottts/svg?seed=InkStyle')
 const isLoggedIn = ref(authStore.loginStatus)
 const searchQuery = ref(searchStore.query)
 
@@ -104,6 +100,27 @@ watch(
     },
     { immediate: true }
 )
+
+// 监听用户头像的变化
+watch(
+    () => authStore.user?.avatar,
+    (newQuery) => {
+        if (!newQuery) {
+            userAvatar.value =
+                'https://api.dicebear.com/7.x/bottts/svg?seed=InkStyle'
+        }
+    },
+    { immediate: true }
+)
+
+onMounted(() => {
+    if (authStore.user?.avatar) {
+        userAvatar.value = authStore.user.avatar
+    } else {
+        userAvatar.value =
+            'https://api.dicebear.com/7.x/bottts/svg?seed=InkStyle'
+    }
+})
 </script>
 
 <style scoped>

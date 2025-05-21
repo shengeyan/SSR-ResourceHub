@@ -1,38 +1,81 @@
 <template>
     <div class="search-page">
-        <h2>搜索结果</h2>
+        <!-- 顶部固定区域 -->
+        <div class="fixed-header">
+            <h2>搜索结果</h2>
 
-        <!-- 显示搜索框 -->
-        <el-input
-            v-model="searchQuery"
-            placeholder="搜索资源"
-            class="search-input"
-            prefix-icon="el-icon-search"
-            @keyup.enter="handleSearch"
-            clearable
-        />
+            <el-input
+                v-model="searchQuery"
+                placeholder="搜索资源"
+                class="search-input"
+                prefix-icon="el-icon-search"
+                @keyup.enter="handleSearch"
+                clearable
+            />
 
-        <!-- 搜索结果 -->
-        <el-card v-if="searchResults.length === 0" class="no-results-card">
-            <p>没有找到匹配的资源。</p>
-        </el-card>
+            <div class="filter-bar">
+                <el-select
+                    v-model="filterType"
+                    placeholder="资源类型"
+                    clearable
+                    style="width: 140px"
+                >
+                    <el-option label="图片" value="image" />
+                    <el-option label="音频" value="audio" />
+                    <el-option label="视频" value="video" />
+                    <el-option label="文件" value="file" />
+                </el-select>
 
-        <!-- 列表展示搜索结果 -->
-        <el-list v-if="searchResults.length > 0">
-            <el-list-item
-                v-for="item in searchResults"
-                :key="item.id"
-                class="list-item"
-                @click="handleItemClick(item)"
-            >
-                <div class="list-item-content">
-                    <h3 class="item-title">{{ item.name }}</h3>
-                    <p class="item-detail">{{ item.detail }}</p>
-                </div>
-            </el-list-item>
-        </el-list>
+                <el-date-picker
+                    v-model="dateRange"
+                    type="daterange"
+                    range-separator="至"
+                    start-placeholder="开始日期"
+                    end-placeholder="结束日期"
+                    format="YYYY-MM-DD"
+                    value-format="YYYY-MM-DD"
+                    style="width: 250px"
+                />
 
-        <!-- 弹窗显示详情 -->
+                <el-select
+                    v-model="sortOrder"
+                    placeholder="上传时间排序"
+                    style="width: 160px"
+                >
+                    <el-option label="最新优先" value="desc" />
+                    <el-option label="最早优先" value="asc" />
+                </el-select>
+
+                <el-button type="primary" @click="applyFilter"
+                    >应用筛选</el-button
+                >
+            </div>
+        </div>
+
+        <!-- 滚动内容区域 -->
+        <div class="scroll-area">
+            <el-card v-if="searchResults.length === 0" class="no-results-card">
+                <p>没有找到匹配的资源。</p>
+            </el-card>
+
+            <el-list v-else>
+                <el-list-item
+                    v-for="item in searchResults"
+                    :key="item.id"
+                    class="list-item"
+                    @click="handleItemClick(item)"
+                >
+                    <div class="list-item-content">
+                        <h3 class="item-title">{{ item.name }}</h3>
+                        <p class="item-detail">
+                            {{ item.detail || '暂无描述' }}
+                        </p>
+                    </div>
+                </el-list-item>
+            </el-list>
+        </div>
+
+        <!-- 弹窗详情 -->
         <el-dialog
             v-model="dialogVisible"
             width="60%"
@@ -40,7 +83,7 @@
             :before-close="handleClose"
             class="custom-dialog"
         >
-            <template #title>
+            <template #header>
                 <div class="dialog-title">
                     <span>{{ selectedItem?.name }}</span>
                     <el-button
@@ -51,16 +94,21 @@
                     />
                 </div>
             </template>
+
             <div class="dialog-content">
-                <!-- 根据资源类型进行不同的渲染 -->
+                <!-- 资源预览 -->
                 <template v-if="selectedItem?.type === 'image'">
-                    <el-image
-                        :src="selectedItem?.url"
-                        fit="contain"
+                    <img
+                        :src="selectedItem.url"
+                        alt="preview"
                         style="
                             max-width: 100%;
-                            max-height: 60vh;
+                            max-height: 35vh;
                             border-radius: 12px;
+                            margin-bottom: 16px;
+                            display: block;
+                            margin-left: auto;
+                            margin-right: auto;
                         "
                     />
                 </template>
@@ -68,28 +116,55 @@
                     <video
                         controls
                         autoplay
-                        style="width: 100%; border-radius: 8px; margin: 12px 0"
+                        style="
+                            width: 100%;
+                            border-radius: 8px;
+                            margin-bottom: 16px;
+                        "
                     >
-                        <source :src="selectedItem?.url" type="video/mp4" />
+                        <source :src="selectedItem.url" type="video/mp4" />
                     </video>
                 </template>
                 <template v-else-if="selectedItem?.type === 'audio'">
-                    <audio controls style="width: 100%; margin: 12px 0">
-                        <source :src="selectedItem?.url" type="audio/mpeg" />
-                        Your browser does not support the audio element.
+                    <audio controls style="width: 100%; margin-bottom: 16px">
+                        <source :src="selectedItem.url" type="audio/mpeg" />
                     </audio>
                 </template>
                 <template v-else-if="selectedItem?.type === 'file'">
-                    <p>{{ selectedItem?.name }}</p>
+                    <el-icon><Document /></el-icon>
+                    <p style="margin: 10px 0">{{ selectedItem.name }}</p>
                 </template>
 
+                <!-- 信息展示 -->
+                <div class="info-grid">
+                    <div><strong>类型：</strong>{{ selectedItem.type }}</div>
+                    <div>
+                        <strong>文件大小：</strong
+                        >{{ formatSize(selectedItem.size) }}
+                    </div>
+                    <div>
+                        <strong>上传时间：</strong
+                        >{{ formatDate(selectedItem.created_at) }}
+                    </div>
+                    <div>
+                        <strong>下载次数：</strong
+                        >{{ selectedItem.download_count }}
+                    </div>
+                </div>
+
+                <!-- 描述 -->
+                <p style="margin-top: 10px; color: #555">
+                    {{ selectedItem.detail || '暂无描述' }}
+                </p>
+
+                <!-- 下载按钮 -->
                 <el-button
                     type="primary"
                     icon="el-icon-download"
                     @click="handleDownloadType"
                     class="action-button"
                 >
-                    下载
+                    下载资源
                 </el-button>
             </div>
         </el-dialog>
@@ -103,16 +178,21 @@ import Resource from '~/api/resources/resources'
 import { useSearchStore } from '~/stores/searchStore'
 
 const searchStore = useSearchStore()
-
-const searchQuery = ref(searchStore.query) // 从 store 中获取搜索查询
-const searchResults = ref([]) // 存储搜索结果
-const selectedItem = ref(null) // 存储当前被选中的项
-const dialogVisible = ref(false) // 控制弹窗的显示与隐藏
-const route = useRoute() // 获取路由对象
+const searchQuery = ref(searchStore.query)
+const fullResults = ref([])
+const searchResults = ref([])
+const selectedItem = ref(null)
+const dialogVisible = ref(false)
+const route = useRoute()
 const router = useRouter()
 
-// 处理搜索逻辑
-const handleSearch = async () => {
+// 筛选与排序状态
+const filterType = ref(null)
+const dateRange = ref([])
+const sortOrder = ref('desc') // 默认按最新优先
+
+// 搜索提交
+const handleSearch = () => {
     if (searchQuery.value) {
         router.push({ path: '/search', query: { q: searchQuery.value } })
     }
@@ -122,24 +202,50 @@ const handleSearch = async () => {
 const searchResources = async (query) => {
     try {
         const response = await Resource.searchResources(query)
-        searchResults.value = response.list
+        fullResults.value = response.list || []
+        applyFilter()
         searchStore.setQuery(query)
     } catch (error) {
         console.error('搜索失败', error)
     }
 }
 
-// 处理点击每个项时的逻辑
+// 应用本地筛选 + 排序
+const applyFilter = () => {
+    const type = filterType.value
+    const [start, end] = dateRange.value
+
+    let filtered = fullResults.value.filter((item) => {
+        const matchType = type ? item.type === type : true
+        const matchDate =
+            start && end
+                ? new Date(item.created_at) >= new Date(start) &&
+                  new Date(item.created_at) <= new Date(end)
+                : true
+        return matchType && matchDate
+    })
+
+    filtered.sort((a, b) => {
+        const timeA = new Date(a.created_at).getTime()
+        const timeB = new Date(b.created_at).getTime()
+        return sortOrder.value === 'asc' ? timeA - timeB : timeB - timeA
+    })
+
+    searchResults.value = filtered
+}
+
+// 打开详情弹窗
 const handleItemClick = (item) => {
     selectedItem.value = item
     dialogVisible.value = true
 }
 
-// 关闭弹窗的处理函数
+// 弹窗关闭
 const handleClose = () => {
     dialogVisible.value = false
 }
 
+// 下载处理
 const handleDownloadType = () => {
     if (selectedItem.value.type === 'image') {
         handleDownloadImage()
@@ -150,10 +256,9 @@ const handleDownloadType = () => {
 
 const handleDownload = () => {
     try {
-        const fileUrl = selectedItem.value.url
         const link = document.createElement('a')
-        link.href = fileUrl
-        link.download = `${selectedItem.value.name}`
+        link.href = selectedItem.value.url
+        link.download = selectedItem.value.name
         link.click()
     } catch (error) {
         console.error('下载失败', error)
@@ -162,48 +267,54 @@ const handleDownload = () => {
 
 const handleDownloadImage = () => {
     try {
-        const fileUrl = selectedItem.value.url
-        const fileName = selectedItem.value.name
-
-        const link = document.createElement('a')
-        link.href = fileUrl
-
-        link.download = fileName
-
         const xhr = new XMLHttpRequest()
-        xhr.open('GET', fileUrl, true)
+        xhr.open('GET', selectedItem.value.url, true)
         xhr.responseType = 'blob'
         xhr.onload = function () {
             const blob = xhr.response
             const url = window.URL.createObjectURL(blob)
-
+            const link = document.createElement('a')
             link.href = url
-            link.download = fileName
+            link.download = selectedItem.value.name
             link.click()
             window.URL.revokeObjectURL(url)
         }
         xhr.send()
     } catch (error) {
-        console.error('下载失败', error)
+        console.error('图片下载失败', error)
     }
 }
 
+const formatSize = (bytes) => {
+    if (bytes < 1024) return `${bytes} B`
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
+    if (bytes < 1024 * 1024 * 1024)
+        return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
+    return `${(bytes / (1024 * 1024 * 1024)).toFixed(1)} GB`
+}
+
+const formatDate = (dateStr) => {
+    const date = new Date(dateStr)
+    return date.toLocaleString()
+}
+
+// 初始化：从路由中获取关键词
 onMounted(async () => {
-    const query = route.query.q
-    if (query) {
-        searchQuery.value = query
-        await searchResources(query)
+    const q = route.query.q
+    if (q) {
+        searchQuery.value = q
+        await searchResources(q)
     }
 })
 
-// 监听搜索词的变化
+// 监听关键词变化
 watch(
     () => route.query.q,
-    async (newQuery) => {
-        if (newQuery) {
-            searchQuery.value = newQuery
-            searchStore.setQuery(newQuery)
-            await searchResources(newQuery)
+    async (newQ) => {
+        if (newQ) {
+            searchQuery.value = newQ
+            searchStore.setQuery(newQ)
+            await searchResources(newQ)
         }
     },
     { immediate: true }
@@ -212,16 +323,44 @@ watch(
 
 <style scoped lang="scss">
 .search-page {
-    padding: 20px;
+    position: relative;
+    height: 100vh;
+    overflow: hidden; // 禁止页面滚动
     max-width: 800px;
     margin: 0 auto;
-    height: 100vh; /* 页面至少占满一个视口 */
-    overflow-y: auto; /* 内容超出时垂直滚动 */
+    background: #fff;
+}
+
+.fixed-header {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: #fff;
+    padding: 20px 0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .search-input {
     width: 100%;
-    margin-bottom: 20px;
+    margin-bottom: 12px;
+}
+
+.filter-bar {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.scroll-area {
+    height: calc(100vh - 180px); // 减去 fixed-header 高度，视需要调整
+    overflow-y: auto;
+    padding: 10px 0;
+    scrollbar-width: none; // Firefox 隐藏滚动条
+}
+
+/* 隐藏 WebKit 滚动条 */
+.scroll-area::-webkit-scrollbar {
+    display: none;
 }
 
 .no-results-card {
@@ -237,18 +376,16 @@ watch(
     border: 1px solid #ddd;
     border-radius: 8px;
     background-color: #f9f9f9;
-
-    &:last-child {
-        margin-bottom: 100px;
-    }
 }
-
-.list-item .item-title {
+.list-item:last-child {
+    margin-bottom: 100px;
+}
+.item-title {
     font-size: 18px;
     font-weight: bold;
 }
 
-.list-item .item-detail {
+.item-detail {
     color: #666;
 }
 
@@ -279,5 +416,14 @@ watch(
 .action-button {
     margin-top: 10px;
     width: 100%;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px 20px;
+    margin-bottom: 12px;
+    font-size: 14px;
+    color: #333;
 }
 </style>

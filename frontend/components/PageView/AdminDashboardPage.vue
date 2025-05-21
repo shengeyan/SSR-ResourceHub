@@ -3,11 +3,16 @@
         <el-main class="main-content">
             <el-card class="welcome-card">
                 <div class="welcome-header">
-                    <el-avatar :size="60" :src="userData.avatar" />
-                    <div class="welcome-info">
-                        <h2>欢迎回来，{{ userData.username }}</h2>
-                        <p>今天是 {{ currentDate }}</p>
+                    <div class="welcome-left">
+                        <el-avatar :size="60" :src="userData.avatar" />
+                        <div class="welcome-info">
+                            <h2>欢迎回来，{{ userData.username }}</h2>
+                            <p>今天是 {{ currentDate }}</p>
+                        </div>
                     </div>
+                    <el-button type="danger" size="small" @click="handleLogout"
+                        >退出登录</el-button
+                    >
                 </div>
             </el-card>
 
@@ -86,16 +91,56 @@
             <el-dialog
                 v-model="editDialogVisible"
                 title="编辑用户信息"
-                width="400px"
+                width="500px"
+                :append-to-body="true"
             >
                 <el-form :model="editForm" label-width="80px">
+                    <!-- 当前头像 -->
+                    <el-form-item label="当前头像">
+                        <el-avatar :src="editForm.avatar" :size="80" />
+                    </el-form-item>
+
+                    <!-- 上传头像按钮 -->
+                    <el-form-item label="上传头像">
+                        <el-upload
+                            accept="image/*"
+                            :auto-upload="false"
+                            :show-file-list="false"
+                            :on-change="handleImageChange"
+                        >
+                            <el-button>选择图片</el-button>
+                        </el-upload>
+                    </el-form-item>
+
+                    <!-- 裁剪区域 -->
+                    <el-form-item
+                        v-if="imageUrl"
+                        label="预览裁剪"
+                        class="cropper-item"
+                    >
+                        <div style="width: 100%">
+                            <Cropper
+                                ref="cropperRef"
+                                :src="imageUrl"
+                                :aspect-ratio="1"
+                                :view-mode="1"
+                                :auto-crop-area="1"
+                                style="width: 100%; height: 300px"
+                            />
+                        </div>
+                    </el-form-item>
+
+                    <!-- 用户名 -->
                     <el-form-item label="用户名">
                         <el-input v-model="editForm.username" />
                     </el-form-item>
+
+                    <!-- 头像链接（只读） -->
                     <el-form-item label="头像链接">
-                        <el-input v-model="editForm.avatar" />
+                        <el-input v-model="editForm.avatar" disabled />
                     </el-form-item>
                 </el-form>
+
                 <template #footer>
                     <el-button @click="editDialogVisible = false"
                         >取消</el-button
@@ -114,7 +159,27 @@ import { ref, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { useAuthStore } from '~/stores/auth'
 import Resource from '~/api/resources/resources.js'
+import Upload from '~/api/upload/upload.js'
 import Auth from '~/api/auth/auth.js'
+import Cropper from 'vue-cropperjs'
+import 'cropperjs/dist/cropper.css'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
+
+const AuthStore = useAuthStore()
+const userData = ref(AuthStore.user)
+
+const imageUrl = ref('')
+const cropperRef = ref(null)
+
+const handleImageChange = (file) => {
+    const reader = new FileReader()
+    reader.onload = () => {
+        imageUrl.value = reader.result
+    }
+    reader.readAsDataURL(file.raw)
+}
 
 const currentDate = new Date().toLocaleDateString('zh-CN', {
     year: 'numeric',
@@ -122,9 +187,6 @@ const currentDate = new Date().toLocaleDateString('zh-CN', {
     day: 'numeric',
     weekday: 'long',
 })
-
-const AuthStore = useAuthStore()
-const userData = ref(AuthStore.user)
 
 const resourcesData = ref({
     list: [],
@@ -225,21 +287,51 @@ const openEditDialog = () => {
 // 更新用户信息
 const updateUserInfo = async () => {
     try {
+        let avatarUrl = editForm.value.avatar
+
+        // 如果有裁剪图像则上传
+        if (cropperRef.value && imageUrl.value) {
+            const canvas = cropperRef.value.getCroppedCanvas()
+            const blob = await new Promise((resolve) =>
+                canvas.toBlob(resolve, 'image/png')
+            )
+
+            const formData = new FormData()
+            const filename = `avatar-${Date.now()}.png`
+
+            formData.append('file', new File([blob], filename))
+            formData.append('type', 'avatar') // 后端会上传到 avatar 文件夹
+            formData.append('name', filename)
+            formData.append('detail', '用户头像')
+
+            // ✅ 使用封装的 API 上传
+            const result = await Upload.uploadFile(formData)
+            avatarUrl = result.url // GitHub raw url
+        }
+        // 更新用户信息
         const res = await Auth.updateUser({
             username: editForm.value.username,
-            avatar: editForm.value.avatar,
+            avatar: avatarUrl,
         })
+
         if (res) {
             ElMessage.success(res.message || '更新成功')
             AuthStore.setUser(res.userInfo)
             userData.value = res.userInfo
             editDialogVisible.value = false
+            imageUrl.value = ''
         } else {
             ElMessage.error(res.message || '更新失败')
         }
     } catch (e) {
+        console.error(e)
         ElMessage.error('更新失败')
     }
+}
+
+const handleLogout = () => {
+    AuthStore.logout()
+    router.push('/')
 }
 
 onMounted(() => {
@@ -270,6 +362,7 @@ onMounted(() => {
     display: flex;
     align-items: center;
     gap: 20px;
+    justify-content: space-between;
 }
 
 .welcome-info h2 {
@@ -303,5 +396,8 @@ onMounted(() => {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 16px;
+}
+.cropper-item .el-form-item__content {
+    display: block;
 }
 </style>

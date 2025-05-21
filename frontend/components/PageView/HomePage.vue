@@ -1,7 +1,9 @@
 <template>
     <el-container class="homepage">
         <el-main class="main-content">
+            <LoadingOverlay v-show="loading" />
             <div
+                v-show="!loading"
                 class="section"
                 v-for="section in sections"
                 :key="section.title"
@@ -20,11 +22,15 @@
                         class="col-item"
                     >
                         <el-card class="resource-card" shadow="hover">
-                            <div class="resource-title">{{ item.name }}</div>
-                            <div class="resource-desc">{{ item.detail }}</div>
+                            <div class="resource-title">
+                                {{ item.name }}
+                            </div>
+                            <div class="resource-desc">
+                                {{ item.detail }}
+                            </div>
 
                             <!-- 根据 type 渲染不同内容 -->
-                            <template v-if="section.type === 'images'">
+                            <template v-if="section.type === 'image'">
                                 <el-image
                                     :src="item.url"
                                     fit="contain"
@@ -70,7 +76,9 @@
 import { ref, onMounted } from 'vue'
 import ResourceApi from '~/api/resources/resources.js'
 import { useRouter } from 'vue-router'
+import LoadingOverlay from '~/components/LoadingOverlay.vue'
 const router = useRouter()
+const loading = ref(true)
 
 const sections = ref([
     {
@@ -90,7 +98,7 @@ const sections = ref([
     },
     {
         title: '图片资源',
-        type: 'images',
+        type: 'image',
         items: [],
     },
 ])
@@ -132,10 +140,11 @@ onMounted(async () => {
         },
         {
             title: '图片资源',
-            type: 'images',
+            type: 'image',
             items: imageData.list,
         },
     ]
+    loading.value = false
 })
 </script>
 

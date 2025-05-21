@@ -61,7 +61,6 @@
 
 <script setup>
 import { ref, computed, watchEffect } from 'vue'
-import NavBar from '@/components/NavBar.vue'
 import ResourceApi from '~/api/resources/resources.js' // 引入你的资源请求接口
 import { useAuthStore } from '~/stores/auth'
 import { ElMessageBox, ElMessage } from 'element-plus'

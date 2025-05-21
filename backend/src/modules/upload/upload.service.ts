@@ -24,7 +24,7 @@ export class UploadService {
       throw new BadRequestException('缺少 type、name 或文件内容');
     }
 
-    const path = `${type}/${name}`;
+    const path = type === 'avatar' ? `avatar/${name}` : `${type}/${name}`;
     const content = file.buffer.toString('base64');
 
     // 假设你在这里使用 GitHub API 或其他文件存储服务来存储文件

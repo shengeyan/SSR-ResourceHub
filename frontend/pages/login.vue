@@ -233,7 +233,7 @@ const resetForm = () => {
     countdown.value = 0
 }
 
-// -------- 忘记密码功能相关 --------
+
 const showResetDialog = ref(false)
 const resetFormRef = ref()
 const resetCountdown = ref(0)

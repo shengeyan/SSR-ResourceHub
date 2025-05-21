@@ -32,7 +32,7 @@ let UploadService = class UploadService {
         if (!file || !type || !name) {
             throw new common_1.BadRequestException('缺少 type、name 或文件内容');
         }
-        const path = `${type}/${name}`;
+        const path = type === 'avatar' ? `avatar/${name}` : `${type}/${name}`;
         const content = file.buffer.toString('base64');
         await this.octokit.repos.createOrUpdateFileContents({
             owner: this.owner,

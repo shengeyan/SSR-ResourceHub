@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.JwtService = void 0;
 const jwt = require("jsonwebtoken");
-const SECRET = 'your-secret-key';
+const SECRET = 'asdfghjk';
 class JwtService {
     sign(payload) {
         return jwt.sign(payload, SECRET, { expiresIn: '7d' });

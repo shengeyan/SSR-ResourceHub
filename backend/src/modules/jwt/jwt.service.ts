@@ -1,6 +1,7 @@
 import * as jwt from 'jsonwebtoken';
 
-const SECRET = 'your-secret-key'; // 建议使用 .env 文件管理
+// const SECRET = 'your-secret-key'; 
+const SECRET = 'asdfghjk'; 
 
 export class JwtService {
   sign(payload: any): string {
