@@ -16,7 +16,6 @@
         </div>
     </Teleport>
 
-    <!-- 弹窗 -->
     <UploadDialog ref="uploadDialogRef" @close="onDialogClose" />
 </template>
 

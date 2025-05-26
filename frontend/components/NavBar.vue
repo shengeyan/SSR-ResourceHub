@@ -65,7 +65,6 @@ const pathMap = {
     images: '/images',
 }
 
-// 计算当前活跃的菜单项
 const activeMenu = ref('home')
 watch(
     () => router.currentRoute.value.path,

@@ -85,21 +85,27 @@ import { ref } from 'vue'
 import { ElMessage } from 'element-plus'
 import { Upload } from '@element-plus/icons-vue'
 import UploadApi from '~/api/upload/upload.js'
+import { useAuthStore } from '~/stores/auth'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
+
+const authStore = useAuthStore()
 
 const visible = ref(false)
 const fileList = ref([])
 const type = ref('image')
-const detail = ref('') // 资源描述
-const fileNamePrefix = ref('') // 用户输入的文件名前缀
-const fileExtension = ref('') // 文件的扩展名
+const detail = ref('') 
+const fileNamePrefix = ref('') 
+const fileExtension = ref('') 
 
 const open = () => {
     visible.value = true
     fileList.value = []
     type.value = 'image'
-    detail.value = '' // 清空描述
-    fileNamePrefix.value = '' // 清空文件名前缀
-    fileExtension.value = '' // 清空文件扩展名
+    detail.value = '' 
+    fileNamePrefix.value = '' 
+    fileExtension.value = '' 
 }
 
 const handleClose = () => {
@@ -124,16 +130,16 @@ const setFileType = (file) => {
     const videoExtensions = ['.mp4', '.avi', '.mkv', '.mov']
 
     if (imageExtensions.some((ext) => fileName.endsWith(ext))) {
-        fileExtension.value = '.jpg' // 假设图片是 jpg 类型
+        fileExtension.value = '.jpg' 
         type.value = 'image'
     } else if (audioExtensions.some((ext) => fileName.endsWith(ext))) {
-        fileExtension.value = '.mp3' // 假设音频是 mp3 类型
+        fileExtension.value = '.mp3' 
         type.value = 'audio'
     } else if (videoExtensions.some((ext) => fileName.endsWith(ext))) {
-        fileExtension.value = '.mp4' // 假设视频是 mp4 类型
+        fileExtension.value = '.mp4' 
         type.value = 'video'
     } else {
-        fileExtension.value = '.txt' // 默认为文件类型
+        fileExtension.value = '.txt' 
         type.value = 'file'
     }
 
@@ -157,14 +163,16 @@ const submitUpload = async () => {
     const formData = new FormData()
     formData.append('file', file)
     formData.append('type', type.value)
-    formData.append('name', fileNamePrefix.value + fileExtension.value) // 将前缀和后缀结合成完整的文件名
-    formData.append('detail', detail.value) // 新增的 detail
+    formData.append('name', fileNamePrefix.value + fileExtension.value)
+    formData.append('detail', detail.value)
+    formData.append('uploader_id', authStore.user.id)
 
     try {
         const res = await UploadApi.uploadFile(formData)
         ElMessage.success('上传成功 ✅')
-        console.log('上传结果:', res)
         handleClose()
+        window.location.reload()
+        console.log('上传失败:', router.currentRoute.value.fullPath)
     } catch (err) {
         ElMessage.error('上传失败: ' + (err.message || '未知错误'))
     }

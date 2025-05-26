@@ -36,7 +36,7 @@ export class Resource {
   download_count: number;
 
   @Column({ type: 'text', nullable: true })
-  detail: string; // 👈 新增字段
+  detail: string;
 
   @CreateDateColumn()
   created_at: Date;

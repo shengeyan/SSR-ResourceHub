@@ -20,8 +20,8 @@ let UploadController = class UploadController {
     constructor(uploadService) {
         this.uploadService = uploadService;
     }
-    async upload(file, type, name, detail) {
-        const url = await this.uploadService.handleUpload(file, type, name, detail);
+    async upload(file, type, name, detail, uploader_id) {
+        const url = await this.uploadService.handleUpload(file, type, name, detail, uploader_id);
         return {
             code: 0,
             data: { url },
@@ -37,8 +37,9 @@ __decorate([
     __param(1, (0, common_1.Body)('type')),
     __param(2, (0, common_1.Body)('name')),
     __param(3, (0, common_1.Body)('detail')),
+    __param(4, (0, common_1.Body)('uploader_id')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object, String, String, String]),
+    __metadata("design:paramtypes", [Object, String, String, String, String]),
     __metadata("design:returntype", Promise)
 ], UploadController.prototype, "upload", null);
 exports.UploadController = UploadController = __decorate([

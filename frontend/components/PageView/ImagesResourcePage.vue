@@ -26,7 +26,6 @@
                             "
                         />
                         <div class="image-title">{{ item.name }}</div>
-                        <div class="image-desc">{{ item.detail }}</div>
                     </el-card>
                 </el-col>
             </el-row>
@@ -61,7 +60,6 @@
             </template>
 
             <div class="dialog-content">
-                <!-- 使图片自适应弹窗并控制最大高度 -->
                 <el-image
                     :src="selectedImage?.url"
                     fit="contain"
@@ -76,7 +74,6 @@
                     下载图片
                 </el-button>
 
-                <!-- 显示删除按钮仅当用户已登录并且是上传者 -->
                 <el-button
                     v-if="canDeleteImage"
                     type="danger"
@@ -98,9 +95,9 @@ import ResourceApi from '~/api/resources/resources.js'
 
 const authStore = useAuthStore()
 
-const imagesCache = ref({}) // Cache for images by page
-const images = ref([]) // All images data
-const total = ref(0) // Total number of images
+const imagesCache = ref({}) 
+const images = ref([])
+const total = ref(0) 
 const currentPage = ref(1)
 const pageSize = 12
 

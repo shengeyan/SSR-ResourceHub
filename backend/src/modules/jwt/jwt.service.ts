@@ -1,7 +1,7 @@
 import * as jwt from 'jsonwebtoken';
 
-// const SECRET = 'your-secret-key'; 
-const SECRET = 'asdfghjk'; 
+// const SECRET = 'your-secret-key';
+const SECRET = 'asdfghjk';
 
 export class JwtService {
   sign(payload: any): string {

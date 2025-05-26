@@ -8,7 +8,7 @@
 
 <script setup>
 import { computed } from 'vue'
-import { useRoute } from 'vue-router' // 导入 useRoute
+import { useRoute } from 'vue-router' 
 import UploadButton from '~/components/UploadButton.vue'
 import NavBar from '@/components/NavBar.vue'
 import { useAuthStore } from '~/stores/auth'

@@ -19,7 +19,13 @@ export class UploadService {
     private readonly resourceRepo: Repository<Resource>,
   ) {}
 
-  async handleUpload(file: any, type: string, name: string, detail: string) {
+  async handleUpload(
+    file: any,
+    type: string,
+    name: string,
+    detail: string,
+    uploader_id: string,
+  ) {
     if (!file || !type || !name) {
       throw new BadRequestException('缺少 type、name 或文件内容');
     }
@@ -27,7 +33,7 @@ export class UploadService {
     const path = type === 'avatar' ? `avatar/${name}` : `${type}/${name}`;
     const content = file.buffer.toString('base64');
 
-    // 假设你在这里使用 GitHub API 或其他文件存储服务来存储文件
+    // Github存储
     await this.octokit.repos.createOrUpdateFileContents({
       owner: this.owner,
       repo: this.repo,
@@ -46,7 +52,6 @@ export class UploadService {
 
     const rawUrl = `https://raw.githubusercontent.com/${this.owner}/${this.repo}/main/${path}`;
 
-    // 存入数据库时保存 detail 字段
     const resource = this.resourceRepo.create({
       id: uuidv4(),
       name,
@@ -55,7 +60,8 @@ export class UploadService {
       size: file.size,
       mime_type: file.mimetype,
       preview_url: type === 'image' ? rawUrl : null,
-      detail, // 保存 detail 字段
+      detail,
+      uploader_id,
     });
 
     await this.resourceRepo.save(resource);

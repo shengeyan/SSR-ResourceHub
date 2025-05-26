@@ -99,7 +99,6 @@
                     下载视频
                 </el-button>
 
-                <!-- 显示删除按钮仅当用户已登录并且是上传者 -->
                 <el-button
                     v-if="canDeleteVideo"
                     type="danger"

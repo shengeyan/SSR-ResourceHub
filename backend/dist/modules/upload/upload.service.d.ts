@@ -6,5 +6,5 @@ export declare class UploadService {
     private owner;
     private repo;
     constructor(resourceRepo: Repository<Resource>);
-    handleUpload(file: any, type: string, name: string, detail: string): Promise<string>;
+    handleUpload(file: any, type: string, name: string, detail: string, uploader_id: string): Promise<string>;
 }

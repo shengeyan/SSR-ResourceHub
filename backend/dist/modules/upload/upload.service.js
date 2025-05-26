@@ -28,7 +28,7 @@ let UploadService = class UploadService {
         this.owner = process.env.GITHUB_OWNER;
         this.repo = process.env.GITHUB_REPO;
     }
-    async handleUpload(file, type, name, detail) {
+    async handleUpload(file, type, name, detail, uploader_id) {
         if (!file || !type || !name) {
             throw new common_1.BadRequestException('缺少 type、name 或文件内容');
         }
@@ -59,6 +59,7 @@ let UploadService = class UploadService {
             mime_type: file.mimetype,
             preview_url: type === 'image' ? rawUrl : null,
             detail,
+            uploader_id,
         });
         await this.resourceRepo.save(resource);
         return rawUrl;

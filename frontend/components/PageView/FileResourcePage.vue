@@ -30,7 +30,6 @@
             </div>
         </el-main>
 
-        <!-- Detail Dialog -->
         <el-dialog
             v-model="detailVisible"
             width="600px"
@@ -50,7 +49,7 @@
                 </div>
             </template>
             <div class="dialog-content">
-                <p>{{ selectedFile?.description }}</p>
+                <p>{{ selectedFile?.detail }}</p>
                 <el-button type="primary" @click="handleDownload"
                     >下载</el-button
                 >
@@ -61,19 +60,19 @@
 
 <script setup>
 import { ref, computed, watchEffect } from 'vue'
-import ResourceApi from '~/api/resources/resources.js' // 引入你的资源请求接口
+import ResourceApi from '~/api/resources/resources.js'
 import { useAuthStore } from '~/stores/auth'
 import { ElMessageBox, ElMessage } from 'element-plus'
 
 const authStore = useAuthStore()
 
-const filesCache = ref({}) // Cache for files by page
-const files = ref([]) // All files data
-const total = ref(0) // Total number of files
+const filesCache = ref({})
+const files = ref([])
+const total = ref(0)
 const currentPage = ref(1)
 const pageSize = 12
 
-// Fetch files from API
+// 请求数据
 const fetchFiles = async (page) => {
     if (filesCache.value[page]) {
         files.value = filesCache.value[page].data
@@ -89,23 +88,19 @@ const fetchFiles = async (page) => {
     total.value = res.total
 }
 
-// Watch for changes in the current page
 watchEffect(() => {
     fetchFiles(currentPage.value)
 })
 
-// Handle file click to open the detail modal
 const openDetail = (file) => {
     selectedFile.value = file
     detailVisible.value = true
 }
 
-// Handle closing of the detail modal
 const handleClose = () => {
     detailVisible.value = false
 }
 
-// Handle page change for pagination
 const handlePageChange = (page) => {
     currentPage.value = page
     fetchFiles(page)
@@ -132,10 +127,10 @@ const handleDownload = () => {
     }
 
     try {
-        const fileUrl = selectedAudio.value.url
+        const fileUrl = selectedFile.value.url
         const link = document.createElement('a')
         link.href = fileUrl
-        link.download = `${selectedAudio.value.name}.mp4`
+        link.download = `${selectedFile.value.name}.mp4`
         link.click()
     } catch (error) {
         console.error('下载失败', error)

@@ -186,10 +186,9 @@ const dialogVisible = ref(false)
 const route = useRoute()
 const router = useRouter()
 
-// 筛选与排序状态
 const filterType = ref(null)
 const dateRange = ref([])
-const sortOrder = ref('desc') // 默认按最新优先
+const sortOrder = ref('desc') 
 
 // 搜索提交
 const handleSearch = () => {
@@ -325,7 +324,7 @@ watch(
 .search-page {
     position: relative;
     height: 100vh;
-    overflow: hidden; // 禁止页面滚动
+    overflow: hidden; 
     max-width: 800px;
     margin: 0 auto;
     background: #fff;
@@ -352,10 +351,10 @@ watch(
 }
 
 .scroll-area {
-    height: calc(100vh - 180px); // 减去 fixed-header 高度，视需要调整
+    height: calc(100vh - 180px); 
     overflow-y: auto;
     padding: 10px 0;
-    scrollbar-width: none; // Firefox 隐藏滚动条
+    scrollbar-width: none; 
 }
 
 /* 隐藏 WebKit 滚动条 */

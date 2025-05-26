@@ -16,9 +16,9 @@ class Upload {
   // 下载文件
   static downloadFile (id) {
     return request({
-      url: `/resource/download?id=${id}`,  // 后端接口
-      method: 'get',  // 使用 GET 请求
-      responseType: 'blob',  // 确保返回文件（Blob 类型）
+      url: `/resource/download?id=${id}`,
+      method: 'get',
+      responseType: 'blob',
     })
   }
 }

@@ -9,7 +9,7 @@ export class ResourceController {
   @Get('download')
   async download(@Query('id') id: string, @Res() res: Response) {
     const resource = await this.resourceService.findOne(id);
-    this.resourceService.increaseDownloadCount(id); // 异步计数
+    this.resourceService.increaseDownloadCount(id);
     await this.resourceService.proxyDownload(resource, res);
   }
   @Get('list')
@@ -25,13 +25,11 @@ export class ResourceController {
     return this.resourceService.searchResources(query);
   }
 
-  // ✅ 新增：根据 uploader_id 获取该用户所有资源
   @Get('by-uploader')
   async getResourcesByUploader(@Query('uploader_id') uploaderId: string) {
     return this.resourceService.findByUploader(uploaderId);
   }
 
-  // ✅ 可选：删除资源
   @Post('delete')
   async deleteResource(@Body() body: { id: string }) {
     return this.resourceService.delete(body.id);

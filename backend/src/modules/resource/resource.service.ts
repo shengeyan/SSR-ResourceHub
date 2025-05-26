@@ -75,7 +75,6 @@ export class ResourceService {
       ]),
       this.dataSource.query(`SELECT COUNT(*) as total FROM ${view}`),
     ]);
-
     return {
       code: 0,
       data: {
@@ -135,12 +134,13 @@ export class ResourceService {
         list,
         total,
         downloadTotal,
-        todayUploadCount, // ✅ 新增字段
+        todayUploadCount,
       },
       message: '获取用户资源成功',
     };
   }
 
+  // 删除资源
   async delete(id: string) {
     const resource = await this.resourceRepo.findOneBy({ id });
     if (!resource) throw new NotFoundException('资源不存在');

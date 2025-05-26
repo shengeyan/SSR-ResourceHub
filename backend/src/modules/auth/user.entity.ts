@@ -9,7 +9,7 @@ import {
 @Entity('users')
 export class User {
   @PrimaryGeneratedColumn('uuid')
-  id: string; // 使用 UUID 作为主键
+  id: string;
 
   @Column({ unique: true, length: 255 })
   email: string;
@@ -21,19 +21,19 @@ export class User {
   password: string;
 
   @Column({ nullable: true, length: 512 })
-  avatar: string; // 用户头像 URL，可为空
+  avatar: string;
 
   @Column({ type: 'tinyint', default: 1 })
-  isActive: boolean; // 是否激活账户
+  isActive: boolean;
 
   @Column({ type: 'tinyint', default: 0 })
-  emailVerified: boolean; // 是否验证邮箱
+  emailVerified: boolean;
 
   @Column({ type: 'tinyint', default: 1 })
-  status: number; // 1=正常, 0=禁用
+  status: number;
 
   @Column({ type: 'datetime', nullable: true })
-  lastLoginAt: Date; // 最后登录时间
+  lastLoginAt: Date;
 
   @CreateDateColumn({ type: 'datetime' })
   createdAt: Date;

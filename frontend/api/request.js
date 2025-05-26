@@ -11,7 +11,7 @@ const request = axios.create({
   }
 })
 
-// 请求拦截器（不再加版本前缀）
+// 请求拦截器
 request.interceptors.request.use(
   config => {
     const token = localStorage.getItem('token')

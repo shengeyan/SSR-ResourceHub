@@ -108,7 +108,7 @@ const pathMap = {
     file: '/file',
     audio: '/audio',
     video: '/video',
-    images: '/images',
+    image: '/images',
 }
 
 const goToMore = (type) => {

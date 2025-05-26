@@ -19,8 +19,15 @@ export class UploadController {
     @Body('type') type: string,
     @Body('name') name: string,
     @Body('detail') detail: string,
+    @Body('uploader_id') uploader_id: string,
   ) {
-    const url = await this.uploadService.handleUpload(file, type, name, detail);
+    const url = await this.uploadService.handleUpload(
+      file,
+      type,
+      name,
+      detail,
+      uploader_id,
+    );
 
     return {
       code: 0,

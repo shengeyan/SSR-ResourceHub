@@ -16,7 +16,6 @@
                 </div>
             </el-card>
 
-            <!-- 原有 admin-widgets 不删除 -->
             <el-row :gutter="20" class="admin-widgets">
                 <el-col :xs="24" :sm="12" :md="8">
                     <el-card shadow="hover">
@@ -42,7 +41,6 @@
                 </el-col>
             </el-row>
 
-            <!-- 新增资源表格 -->
             <el-card class="resource-card">
                 <div class="card-header">
                     <span>我的资源</span>
@@ -87,7 +85,6 @@
                 </el-table>
             </el-card>
 
-            <!-- 编辑用户信息弹窗 -->
             <el-dialog
                 v-model="editDialogVisible"
                 title="编辑用户信息"
@@ -195,7 +192,6 @@ const resourcesData = ref({
     todayUploadCount: 0,
 })
 const userResources = ref([])
-// 编辑用户信息弹窗逻辑
 const editDialogVisible = ref(false)
 const editForm = ref({
     username: '',
@@ -300,13 +296,12 @@ const updateUserInfo = async () => {
             const filename = `avatar-${Date.now()}.png`
 
             formData.append('file', new File([blob], filename))
-            formData.append('type', 'avatar') // 后端会上传到 avatar 文件夹
+            formData.append('type', 'avatar') 
             formData.append('name', filename)
             formData.append('detail', '用户头像')
 
-            // ✅ 使用封装的 API 上传
             const result = await Upload.uploadFile(formData)
-            avatarUrl = result.url // GitHub raw url
+            avatarUrl = result.url 
         }
         // 更新用户信息
         const res = await Auth.updateUser({
@@ -344,13 +339,13 @@ onMounted(() => {
     height: 100vh;
     display: flex;
     flex-direction: column;
-    overflow: hidden; /* 保证内部控制滚动 */
+    overflow: hidden;
 }
 
 .main-content {
     flex: 1;
     overflow-y: auto;
-    max-height: calc(100vh - 60px); /* 根据实际 header 高度调整 */
+    max-height: calc(100vh - 60px); 
 }
 
 .welcome-card {
