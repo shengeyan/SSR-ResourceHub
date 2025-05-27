@@ -80,7 +80,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watchEffect } from 'vue'
+import { ref, watchEffect } from 'vue'
 import ResourceApi from '~/api/resources/resources.js'
 import { useAuthStore } from '~/stores/auth'
 import { ElMessageBox, ElMessage } from 'element-plus'
@@ -91,7 +91,6 @@ const audios = ref([])
 const total = ref(0)
 const currentPage = ref(1)
 const pageSize = 12
-
 const detailVisible = ref(false)
 const selectedAudio = ref(null)
 
@@ -128,11 +127,7 @@ const handlePageChange = (page) => {
     fetchAudios(page)
 }
 
-// Init
-watchEffect(() => {
-    fetchAudios(currentPage.value)
-})
-
+// 下载资源
 const handleDownload = async () => {
     // 判断是否登录
     if (!authStore.loginStatus) {
@@ -161,6 +156,11 @@ const handleDownload = async () => {
         console.error('下载失败', error)
     }
 }
+
+// Init
+watchEffect(() => {
+    fetchAudios(currentPage.value)
+})
 </script>
 
 <style scoped>

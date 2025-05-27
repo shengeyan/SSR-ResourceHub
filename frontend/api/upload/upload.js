@@ -22,6 +22,7 @@ class Upload {
     })
   }
 
+  // 增加下载次数
   static increaseDownloadCount (id) {
     return request({
       url: '/resource/increase-download',

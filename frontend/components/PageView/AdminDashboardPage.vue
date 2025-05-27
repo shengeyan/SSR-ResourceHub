@@ -163,28 +163,11 @@ import 'cropperjs/dist/cropper.css'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
-
 const AuthStore = useAuthStore()
 const userData = ref(AuthStore.user)
-
 const imageUrl = ref('')
 const cropperRef = ref(null)
-
-const handleImageChange = (file) => {
-    const reader = new FileReader()
-    reader.onload = () => {
-        imageUrl.value = reader.result
-    }
-    reader.readAsDataURL(file.raw)
-}
-
-const currentDate = new Date().toLocaleDateString('zh-CN', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-    weekday: 'long',
-})
-
+// 资源数据
 const resourcesData = ref({
     list: [],
     total: 0,
@@ -196,6 +179,23 @@ const editDialogVisible = ref(false)
 const editForm = ref({
     username: '',
     avatar: '',
+})
+
+//选择图片
+const handleImageChange = (file) => {
+    const reader = new FileReader()
+    reader.onload = () => {
+        imageUrl.value = reader.result
+    }
+    reader.readAsDataURL(file.raw)
+}
+
+//当前时间
+const currentDate = new Date().toLocaleDateString('zh-CN', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    weekday: 'long',
 })
 
 // 获取用户资源
@@ -328,6 +328,7 @@ const updateUserInfo = async () => {
     }
 }
 
+// 退出登录
 const handleLogout = () => {
     AuthStore.logout()
     router.push('/')
