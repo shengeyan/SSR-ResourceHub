@@ -133,7 +133,7 @@ watchEffect(() => {
     fetchAudios(currentPage.value)
 })
 
-const handleDownload = () => {
+const handleDownload = async () => {
     // 判断是否登录
     if (!authStore.loginStatus) {
         ElMessageBox.confirm('您尚未登录，是否登录后继续下载？', '未登录', {
@@ -156,6 +156,7 @@ const handleDownload = () => {
         link.href = fileUrl
         link.download = `${selectedAudio.value.name}.mp4`
         link.click()
+        await Upload.increaseDownloadCount(selectedAudio.value.id)
     } catch (error) {
         console.error('下载失败', error)
     }

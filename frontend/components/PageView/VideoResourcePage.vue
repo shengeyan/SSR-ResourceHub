@@ -118,6 +118,7 @@ import { ref, reactive, computed, watchEffect } from 'vue'
 import { useAuthStore } from '~/stores/auth'
 import ResourceApi from '~/api/resources/resources.js'
 import { ElMessageBox, ElMessage } from 'element-plus'
+import Upload from '~/api/upload/upload.js'
 
 const authStore = useAuthStore()
 
@@ -161,7 +162,7 @@ const handlePageChange = (page) => {
 }
 
 // 下载视频
-const handleDownload = () => {
+const handleDownload = async () => {
     // 判断是否登录
     if (!authStore.loginStatus) {
         ElMessageBox.confirm('您尚未登录，是否登录后继续下载？', '未登录', {
@@ -179,11 +180,12 @@ const handleDownload = () => {
     }
 
     try {
-        const fileUrl = selectedAudio.value.url
+        const fileUrl = selectedVideo.value.url
         const link = document.createElement('a')
         link.href = fileUrl
-        link.download = `${selectedAudio.value.name}.mp4`
+        link.download = `${selectedVideo.value.name}.mp4`
         link.click()
+        await Upload.increaseDownloadCount(selectedVideo.value.id)
     } catch (error) {
         console.error('下载失败', error)
     }

@@ -30,6 +30,13 @@ export declare class ResourceController {
         };
         message: string;
     }>;
+    increaseDownload(body: {
+        id: string;
+    }): Promise<{
+        code: number;
+        data: any;
+        message: string;
+    }>;
     deleteResource(body: {
         id: string;
     }): Promise<{

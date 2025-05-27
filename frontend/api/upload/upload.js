@@ -21,6 +21,14 @@ class Upload {
       responseType: 'blob',
     })
   }
+
+  static increaseDownloadCount (id) {
+    return request({
+      url: '/resource/increase-download',
+      method: 'post',
+      data: { id },
+    })
+  }
 }
 
 export default Upload

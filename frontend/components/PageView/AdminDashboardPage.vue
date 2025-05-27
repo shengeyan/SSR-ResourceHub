@@ -227,7 +227,7 @@ const deleteResource = async (row) => {
 }
 
 // 下载资源
-const handleDownload = (row) => {
+const handleDownload = async (row) => {
     if (!row || !row.url) return
     const fileUrl = row.url
     const fileName = row.name || '下载文件'
@@ -237,7 +237,7 @@ const handleDownload = (row) => {
             const xhr = new XMLHttpRequest()
             xhr.open('GET', fileUrl, true)
             xhr.responseType = 'blob'
-            xhr.onload = function () {
+            xhr.onload = async function () {
                 const blob = xhr.response
                 const url = window.URL.createObjectURL(blob)
 
@@ -248,6 +248,8 @@ const handleDownload = (row) => {
                 link.click()
                 document.body.removeChild(link)
                 window.URL.revokeObjectURL(url)
+                await Upload.increaseDownloadCount(row.id)
+                await fetchUserResources()
             }
             xhr.onerror = () => {
                 ElMessage.error('图片下载失败')
@@ -266,6 +268,8 @@ const handleDownload = (row) => {
             document.body.appendChild(link)
             link.click()
             document.body.removeChild(link)
+            await Upload.increaseDownloadCount(row.id)
+            await fetchUserResources()
         } catch (error) {
             console.error('下载失败', error)
             ElMessage.error('下载失败')
@@ -296,12 +300,12 @@ const updateUserInfo = async () => {
             const filename = `avatar-${Date.now()}.png`
 
             formData.append('file', new File([blob], filename))
-            formData.append('type', 'avatar') 
+            formData.append('type', 'avatar')
             formData.append('name', filename)
             formData.append('detail', '用户头像')
 
             const result = await Upload.uploadFile(formData)
-            avatarUrl = result.url 
+            avatarUrl = result.url
         }
         // 更新用户信息
         const res = await Auth.updateUser({
@@ -345,7 +349,7 @@ onMounted(() => {
 .main-content {
     flex: 1;
     overflow-y: auto;
-    max-height: calc(100vh - 60px); 
+    max-height: calc(100vh - 60px);
 }
 
 .welcome-card {

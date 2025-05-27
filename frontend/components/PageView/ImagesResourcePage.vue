@@ -92,12 +92,12 @@ import { ref, computed, watchEffect } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { useAuthStore } from '~/stores/auth'
 import ResourceApi from '~/api/resources/resources.js'
+import Upload from '~/api/upload/upload.js'
 
 const authStore = useAuthStore()
-
-const imagesCache = ref({}) 
+const imagesCache = ref({})
 const images = ref([])
-const total = ref(0) 
+const total = ref(0)
 const currentPage = ref(1)
 const pageSize = 12
 
@@ -168,7 +168,7 @@ const handleDownload = () => {
         const xhr = new XMLHttpRequest()
         xhr.open('GET', fileUrl, true)
         xhr.responseType = 'blob'
-        xhr.onload = function () {
+        xhr.onload = async function () {
             const blob = xhr.response
             const url = window.URL.createObjectURL(blob)
 
@@ -176,6 +176,7 @@ const handleDownload = () => {
             link.download = fileName
             link.click()
             window.URL.revokeObjectURL(url)
+            await Upload.increaseDownloadCount(selectedImage.value.id)
         }
         xhr.send()
     } catch (error) {

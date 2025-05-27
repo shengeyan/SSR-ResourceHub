@@ -22,7 +22,6 @@
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
 import UploadDialog from '@/components/UploadDialog.vue'
-import { Upload } from '@element-plus/icons-vue'
 import { useAuthStore } from '~/stores/auth'
 import { ElMessageBox, ElMessage } from 'element-plus'
 
@@ -78,7 +77,7 @@ const stopDrag = () => {
 
 const handleClick = () => {
     if (!authStore.loginStatus) {
-        ElMessageBox.confirm('您尚未登录，是否登录后继续下载？', '未登录', {
+        ElMessageBox.confirm('您尚未登录，是否登录后继续上传？', '未登录', {
             confirmButtonText: '登录',
             cancelButtonText: '取消',
             type: 'warning',
@@ -87,7 +86,7 @@ const handleClick = () => {
                 router.push('/login')
             })
             .catch(() => {
-                ElMessage.info('下载已取消')
+                ElMessage.info('上传已取消')
             })
         return
     }

@@ -33,6 +33,14 @@ let ResourceController = class ResourceController {
     async getResourcesByUploader(uploaderId) {
         return this.resourceService.findByUploader(uploaderId);
     }
+    async increaseDownload(body) {
+        await this.resourceService.increaseDownloadCount(body.id);
+        return {
+            code: 0,
+            data: null,
+            message: '下载次数已增加',
+        };
+    }
     async deleteResource(body) {
         return this.resourceService.delete(body.id);
     }
@@ -68,6 +76,13 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], ResourceController.prototype, "getResourcesByUploader", null);
+__decorate([
+    (0, common_1.Post)('increase-download'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], ResourceController.prototype, "increaseDownload", null);
 __decorate([
     (0, common_1.Post)('delete'),
     __param(0, (0, common_1.Body)()),

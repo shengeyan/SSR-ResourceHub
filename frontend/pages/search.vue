@@ -176,6 +176,7 @@ import { ref, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import Resource from '~/api/resources/resources'
 import { useSearchStore } from '~/stores/searchStore'
+import Upload from '~/api/upload/upload.js'
 
 const searchStore = useSearchStore()
 const searchQuery = ref(searchStore.query)
@@ -188,7 +189,7 @@ const router = useRouter()
 
 const filterType = ref(null)
 const dateRange = ref([])
-const sortOrder = ref('desc') 
+const sortOrder = ref('desc')
 
 // 搜索提交
 const handleSearch = () => {
@@ -245,12 +246,13 @@ const handleClose = () => {
 }
 
 // 下载处理
-const handleDownloadType = () => {
+const handleDownloadType = async () => {
     if (selectedItem.value.type === 'image') {
         handleDownloadImage()
     } else {
         handleDownload()
     }
+    await Upload.increaseDownloadCount(selectedItem.value.id)
 }
 
 const handleDownload = () => {
@@ -324,7 +326,7 @@ watch(
 .search-page {
     position: relative;
     height: 100vh;
-    overflow: hidden; 
+    overflow: hidden;
     max-width: 800px;
     margin: 0 auto;
     background: #fff;
@@ -351,10 +353,10 @@ watch(
 }
 
 .scroll-area {
-    height: calc(100vh - 180px); 
+    height: calc(100vh - 180px);
     overflow-y: auto;
     padding: 10px 0;
-    scrollbar-width: none; 
+    scrollbar-width: none;
 }
 
 /* 隐藏 WebKit 滚动条 */

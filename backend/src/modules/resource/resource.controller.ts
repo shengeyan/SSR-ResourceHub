@@ -30,6 +30,16 @@ export class ResourceController {
     return this.resourceService.findByUploader(uploaderId);
   }
 
+  @Post('increase-download')
+  async increaseDownload(@Body() body: { id: string }) {
+    await this.resourceService.increaseDownloadCount(body.id);
+    return {
+      code: 0,
+      data: null,
+      message: '下载次数已增加',
+    };
+  }
+
   @Post('delete')
   async deleteResource(@Body() body: { id: string }) {
     return this.resourceService.delete(body.id);
